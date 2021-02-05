@@ -5,6 +5,7 @@ const methodOverride = require("method-override");
 const Campground = require("./models/campground");
 const ejsMate = require("ejs-mate");
 const asyncErrorHandler = require("./utils/asyncErrorHandler");
+const ExpressError = require("./utils/expressError");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
     useNewUrlParser: true,
@@ -68,6 +69,9 @@ app.post(
     "/campgrounds",
     asyncErrorHandler(async (request, response, next) => {
         const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
+        console.log(title);
+        if (!title || !location || !image || !description || !price)
+            throw new ExpressError("Invalid Campground Data", 400);
         const campground = new Campground({ title, location, image, description, price }, { runValidators: true });
         await campground.save();
         response.redirect(`/campgrounds/${campground._id}`);
@@ -97,8 +101,13 @@ app.delete(
     })
 );
 
+app.all("*", (request, response, next) => {
+    next(new ExpressError("Not Found", 404));
+});
+
 app.use((error, request, response, next) => {
-    response.send("Oh boy, Something went wrong");
+    const { statusCode = 500, message = "Something went worng" } = error;
+    response.status(statusCode).send(message);
 });
 
 app.listen(3000, () => {
