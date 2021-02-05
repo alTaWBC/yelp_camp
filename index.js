@@ -31,11 +31,13 @@ app.use(methodOverride("_method"));
 
 const validateCampground = (request, response, next) => {
     const { error } = joiCampground.CampgroundSchema.validate(request.body);
-
-    if (!error) next();
-
-    const errors = error.details.map(({ message }) => message).join(", ");
-    throw new ExpressError(errors, 400);
+    if (error) {
+        const errors = error.details.map(({ message }) => message).join(", ");
+        throw new ExpressError(errors, 400);
+    } else {
+        console.log("No Errors");
+        next();
+    }
 };
 
 app.get("/", (request, response) => {
@@ -80,10 +82,7 @@ app.post(
     validateCampground,
     asyncErrorHandler(async (request, response, next) => {
         const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
-        console.log(title);
-        if (!title || !location || !image || !description || !price)
-            throw new ExpressError("Invalid Campground Data", 400);
-        const campground = new Campground({ title, location, image, description, price }, { runValidators: true });
+        const campground = new Campground({ title, location, image, description, price });
         await campground.save();
         response.redirect(`/campgrounds/${campground._id}`);
     })
