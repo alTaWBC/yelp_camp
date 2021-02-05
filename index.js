@@ -107,7 +107,7 @@ app.all("*", (request, response, next) => {
 
 app.use((error, request, response, next) => {
     const { statusCode = 500, message = "Something went worng" } = error;
-    response.status(statusCode).send(message);
+    response.status(statusCode).render("errors/mongoose", { error });
 });
 
 app.listen(3000, () => {
