@@ -6,6 +6,7 @@ const Campground = require("./models/campground");
 const ejsMate = require("ejs-mate");
 const asyncErrorHandler = require("./utils/asyncErrorHandler");
 const ExpressError = require("./utils/expressError");
+const joiCampground = require("./joi/campground");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
     useNewUrlParser: true,
@@ -27,6 +28,15 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+
+const validateCampground = (request, response, next) => {
+    const { error } = joiCampground.CampgroundSchema.validate(request.body);
+
+    if (!error) next();
+
+    const errors = error.details.map(({ message }) => message).join(", ");
+    throw new ExpressError(errors, 400);
+};
 
 app.get("/", (request, response) => {
     response.render("home");
@@ -67,6 +77,7 @@ app.get(
 
 app.post(
     "/campgrounds",
+    validateCampground,
     asyncErrorHandler(async (request, response, next) => {
         const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
         console.log(title);
@@ -80,6 +91,7 @@ app.post(
 
 app.patch(
     "/campgrounds/:id",
+    validateCampground,
     asyncErrorHandler(async (request, response, next) => {
         const { title, location, image, description, price } = request.body.campground;
         const { id } = request.params;
