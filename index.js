@@ -135,7 +135,7 @@ app.delete(
     "/campgrounds/:id",
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
-        await Campground.findByIdAndRemove(id);
+        await Campground.findByIdAndDelete(id);
         response.redirect("/campgrounds");
     })
 );
@@ -145,8 +145,9 @@ app.delete(
     asyncErrorHandler(async (request, response) => {
         const { campgroundId, reviewId } = request.params;
         console.log(campgroundId, reviewId);
-        await Review.findByIdAndDelete(reviewId);
+        // pull tells mongo to remove form collection
         await Campground.findByIdAndUpdate(campgroundId, { $pull: { review: reviewId } });
+        await Review.findByIdAndDelete(reviewId);
         response.redirect(`/campgrounds/${campgroundId}`);
     })
 );
