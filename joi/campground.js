@@ -11,5 +11,3 @@ module.exports.CampgroundSchema = joi.object({
         })
         .required(),
 });
-
-module.exports;
