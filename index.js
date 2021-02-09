@@ -140,6 +140,17 @@ app.delete(
     })
 );
 
+app.delete(
+    "/campgrounds/:campgroundId/reviews/:reviewId",
+    asyncErrorHandler(async (request, response) => {
+        const { campgroundId, reviewId } = request.params;
+        console.log(campgroundId, reviewId);
+        await Review.findByIdAndDelete(reviewId);
+        await Campground.findByIdAndUpdate(campgroundId, { $pull: { review: reviewId } });
+        response.redirect(`/campgrounds/${campgroundId}`);
+    })
+);
+
 app.all("*", (request, response, next) => {
     next(new ExpressError("Not Found", 404));
 });
