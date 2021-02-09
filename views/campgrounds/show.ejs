@@ -20,13 +20,8 @@
             </div>
             <div class="card-footer text-muted">2 days ago</div>
         </div>
-        <!-- <ul> --!>
-            <!-- <% //for (const review of campgrounds.reviews) { %> -->
-        <!-- <li><%= //review.body %></li> --!>
-            <!-- <li><%= // review.rating %></li> --!>
-            <!-- <% //} %> -->
-        <!--</ul> -->
-        <form action="/campgrounds/<%= campground._id %>/review" method="POST" class="mb-3 validated-form" novalidate>
+
+        <form action="/campgrounds/<%= campground._id %>/reviews" method="POST" class="mb-3 validated-form" novalidate>
             <h2>Leave a Review</h2>
             <div class="mb-3">
                 <label class="form-label" for="rating">Rating</label>
@@ -39,5 +34,10 @@
             </div>
             <button class="btn btn-success">Submit</button>
         </form>
+        <% for (const review of campground.reviews) { %>
+        <div class="mb-3">
+            <p><%= review.body %> <sub>Rating: <%= review.rating %></sub></p>
+        </div>
+        <% } %>
     </div>
 </div>

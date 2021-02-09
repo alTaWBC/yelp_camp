@@ -76,7 +76,7 @@ app.get(
     "/campgrounds/:id",
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
-        const campground = await Campground.findById(id);
+        const campground = await Campground.findById(id).populate("reviews");
         response.render("campgrounds/show", { campground });
     })
 );
@@ -107,7 +107,7 @@ app.post(
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
         const { body, rating } = request.body.review;
-        const campground = await Campground.findById(id);
+        const campground = await Campground.findById(id).populate("reviews");
         const review = Review({ body, rating });
         campground.reviews.push(review);
         await review.save();
