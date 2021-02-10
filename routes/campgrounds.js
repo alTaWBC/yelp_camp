@@ -1,11 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const Campground = require("../models/campground");
-const Review = require("../models/review");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const joiCampground = require("../joi/campground");
-const joiReview = require("../joi/review");
 const ExpressError = require("../utils/expressError");
+const Campground = require("../models/campground");
 
 const validateCampground = (request, _, next) => {
     const { error } = joiCampground.CampgroundSchema.validate(request.body);
@@ -13,25 +11,13 @@ const validateCampground = (request, _, next) => {
         const errors = error.details.map(({ message }) => message).join(", ");
         throw new ExpressError(errors, 400);
     } else {
-        console.log("No Errors");
-        next();
-    }
-};
-
-const validateReview = (request, _, next) => {
-    const { error } = joiReview.ReviewSchema.validate(request.body);
-    if (error) {
-        const errors = error.details.map(({ message }) => message).join(", ");
-        throw new ExpressError(errors, 400);
-    } else {
-        console.log("No Errors");
         next();
     }
 };
 
 router.get(
     "/",
-    asyncErrorHandler(async (request, response) => {
+    asyncErrorHandler(async (_, response) => {
         const campgrounds = await Campground.find({});
         response.render("campgrounds/index", { campgrounds });
     })
@@ -39,7 +25,7 @@ router.get(
 
 router.get(
     "/new",
-    asyncErrorHandler(async (request, response) => {
+    asyncErrorHandler(async (_, response) => {
         response.render("campgrounds/new");
     })
 );
@@ -65,7 +51,7 @@ router.get(
 router.post(
     "/",
     validateCampground,
-    asyncErrorHandler(async (request, response, next) => {
+    asyncErrorHandler(async (request, response) => {
         const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
         const campground = new Campground({ title, location, image, description, price });
         await campground.save();
@@ -73,18 +59,12 @@ router.post(
     })
 );
 
-router.post(
-    "/:id/reviews",
-    validateReview,
+router.delete(
+    "/:id",
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
-        const { body, rating } = request.body.review;
-        const campground = await Campground.findById(id).populate("reviews");
-        const review = Review({ body, rating });
-        campground.reviews.push(review);
-        await review.save();
-        await campground.save();
-        response.redirect(`/campgrounds/${campground._id}`);
+        await Campground.findByIdAndDelete(id);
+        response.redirect("/campgrounds");
     })
 );
 
@@ -100,27 +80,6 @@ router.patch(
             { runValidators: true }
         );
         response.redirect(`/campgrounds/${campground._id}`);
-    })
-);
-
-router.delete(
-    "/:id",
-    asyncErrorHandler(async (request, response) => {
-        const { id } = request.params;
-        await Campground.findByIdAndDelete(id);
-        response.redirect("/campgrounds");
-    })
-);
-
-router.delete(
-    "/:campgroundId/reviews/:reviewId",
-    asyncErrorHandler(async (request, response) => {
-        const { campgroundId, reviewId } = request.params;
-        console.log(campgroundId, reviewId);
-        // pull tells mongo to remove form collection
-        await Campground.findByIdAndUpdate(campgroundId, { $pull: { review: reviewId } });
-        await Review.findByIdAndDelete(reviewId);
-        response.redirect(`/campgrounds/${campgroundId}`);
     })
 );
 
