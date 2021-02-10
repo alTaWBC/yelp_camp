@@ -32,6 +32,7 @@ router.post(
         campground.reviews.push(review);
         await review.save();
         await campground.save();
+        request.flash("success", "Successfully created a new review");
         response.redirect(`/campgrounds/${campground._id}`);
     })
 );
@@ -44,6 +45,7 @@ router.delete(
         // pull tells mongo to remove form collection
         await Campground.findByIdAndUpdate(campgroundId, { $pull: { review: reviewId } });
         await Review.findByIdAndDelete(reviewId);
+        request.flash("success", "Successfully deleted the review");
         response.redirect(`/campgrounds/${campgroundId}`);
     })
 );

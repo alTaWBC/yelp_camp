@@ -80,7 +80,7 @@ router.patch(
             { title, location, image, description, price },
             { runValidators: true }
         );
-        request.flash("success", "You successfully added a campground");
+        request.flash("success", "You successfully updated a campground");
         response.redirect(`/campgrounds/${campground._id}`);
     })
 );
