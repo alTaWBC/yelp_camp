@@ -5,6 +5,7 @@ const joiCampground = require("../joi/campground");
 const ExpressError = require("../utils/expressError");
 const Campground = require("../models/campground");
 
+
 const validateCampground = (request, _, next) => {
     const { error } = joiCampground.CampgroundSchema.validate(request.body);
     if (error) {
