@@ -35,6 +35,10 @@ router.get(
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
         const campground = await Campground.findById(id).populate("reviews");
+        if (!campground) {
+            request.flash("error", "Cannot find that campground");
+            return response.redirect("/campgrounds");
+        }
         response.render("campgrounds/show", { campground });
     })
 );
