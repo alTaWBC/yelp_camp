@@ -7,6 +7,7 @@ const ExpressError = require("./utils/expressError");
 const campgrounds = require("./routes/campgrounds");
 const reviews = require("./routes/reviews");
 const session = require("express-session");
+const flash = require("connect-flash");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
     useNewUrlParser: true,
@@ -45,6 +46,13 @@ const sessionConfig = {
     },
 };
 app.use(session(sessionConfig));
+app.use(flash());
+
+app.use((request, response, next) => {
+    response.locals.success = request.flash("success");
+    response.locals.error = request.flash("error");
+    next();
+});
 
 app.use("/campgrounds", campgrounds);
 app.use("/campgrounds/:campgroundId/reviews", reviews);

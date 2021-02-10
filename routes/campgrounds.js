@@ -5,7 +5,6 @@ const joiCampground = require("../joi/campground");
 const ExpressError = require("../utils/expressError");
 const Campground = require("../models/campground");
 
-
 const validateCampground = (request, _, next) => {
     const { error } = joiCampground.CampgroundSchema.validate(request.body);
     if (error) {
@@ -56,6 +55,7 @@ router.post(
         const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
         const campground = new Campground({ title, location, image, description, price });
         await campground.save();
+        request.flash("success", "You successfully added a campground");
         response.redirect(`/campgrounds/${campground._id}`);
     })
 );
@@ -80,6 +80,7 @@ router.patch(
             { title, location, image, description, price },
             { runValidators: true }
         );
+        request.flash("success", "You successfully added a campground");
         response.redirect(`/campgrounds/${campground._id}`);
     })
 );
