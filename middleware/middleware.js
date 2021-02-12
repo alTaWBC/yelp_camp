@@ -2,6 +2,7 @@ const joiCampground = require("../joi/campground");
 const ExpressError = require("../utils/expressError");
 const Campground = require("../models/campground");
 const joiReview = require("../joi/review");
+const Review = require("../models/review");
 
 module.exports.isLoggedIn = (request, response, next) => {
     if (!request.isAuthenticated()) {
@@ -16,6 +17,16 @@ module.exports.isAuthor = async (request, response, next) => {
     const { id } = request.params;
     const campground = await Campground.findById(id);
     if (!campground.author.equals(request.user._id)) {
+        request.flash("error", "You do not have permission to do that!");
+        return response.redirect(`/campgrounds/${id}`);
+    }
+    next();
+};
+
+module.exports.isReviewAuthor = async (request, response, next) => {
+    const { id, reviewId } = request.params;
+    const review = await Review.findById(reviewId);
+    if (!review.author.equals(request.user._id)) {
         request.flash("error", "You do not have permission to do that!");
         return response.redirect(`/campgrounds/${id}`);
     }

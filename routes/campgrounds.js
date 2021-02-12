@@ -4,8 +4,6 @@ const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const Campground = require("../models/campground");
 const { isLoggedIn, validateCampground, isAuthor } = require("../middleware/middleware");
 
-
-
 router.get(
     "/",
     asyncErrorHandler(async (_, response) => {
@@ -26,7 +24,10 @@ router.get(
     "/:id",
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
-        const campground = await Campground.findById(id).populate("reviews").populate("author");
+        // How to do nested populate
+        const campground = await Campground.findById(id)
+            .populate({ path: "reviews", populate: { path: "author" } })
+            .populate("author");
         if (!campground) {
             request.flash("error", "Cannot find that campground");
             return response.redirect("/campgrounds");

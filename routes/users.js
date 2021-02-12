@@ -31,17 +31,24 @@ router.get("/login", (request, response) => {
     response.render("users/login");
 });
 
+const RedirectRequest = (path) => {
+    if (!path) return "/campgrounds";
+    const id = path.split("/")[2];
+    console.log(id);
+    return `/campgrounds/${id}`;
+};
+
 // Using passport for authentication
 router.post(
     "/login",
     passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }),
     (request, response) => {
-        request.flash("success", "welcome back");
-        const redirectUrl = request.session.returnTo || "/campgrounds";
+        const redirectUrl = RedirectRequest(request.session.returnTo);
         delete request.session.returnTo;
         response.redirect(redirectUrl);
     }
 );
+
 
 router.get("/logout", (request, response) => {
     request.logout();

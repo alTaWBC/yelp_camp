@@ -2,7 +2,7 @@ const express = require("express");
 const Review = require("../models/review");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const Campground = require("../models/campground");
-const { isLoggedIn, validateReview } = require("../middleware/middleware");
+const { isLoggedIn, validateReview, isReviewAuthor } = require("../middleware/middleware");
 
 // Use this line to have access all parameters
 // { mergeParams: true }
@@ -14,9 +14,9 @@ router.post(
     isLoggedIn,
     validateReview,
     asyncErrorHandler(async (request, response) => {
-        const { campgroundId } = request.params;
+        const { id } = request.params;
         const { body, rating } = request.body.review;
-        const campground = await Campground.findById(campgroundId).populate("reviews");
+        const campground = await Campground.findById(id).populate("reviews");
         const review = Review({ body, rating });
         review.author = request.user._id;
         campground.reviews.push(review);
@@ -30,13 +30,14 @@ router.post(
 router.delete(
     "/:reviewId",
     isLoggedIn,
+    isReviewAuthor,
     asyncErrorHandler(async (request, response) => {
-        const { campgroundId, reviewId } = request.params;
+        const { id, reviewId } = request.params;
         // pull tells mongo to remove form collection
-        await Campground.findByIdAndUpdate(campgroundId, { $pull: { review: reviewId } });
+        await Campground.findByIdAndUpdate(id, { $pull: { review: reviewId } });
         await Review.findByIdAndDelete(reviewId);
         request.flash("success", "Successfully deleted the review");
-        response.redirect(`/campgrounds/${campgroundId}`);
+        response.redirect(`/campgrounds/${id}`);
     })
 );
 

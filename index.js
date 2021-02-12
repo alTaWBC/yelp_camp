@@ -80,7 +80,7 @@ app.get("/fakeUser", async (request, response) => {
 
 app.use("/", userRoutes);
 app.use("/campgrounds", campgroundRoutes);
-app.use("/campgrounds/:campgroundId/reviews", reviewRoutes);
+app.use("/campgrounds/:id/reviews", reviewRoutes);
 
 app.get("/", (_, response) => {
     response.render("home");
