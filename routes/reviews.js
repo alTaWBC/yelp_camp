@@ -16,7 +16,6 @@ const validateReview = (request, _, next) => {
         const errors = error.details.map(({ message }) => message).join(", ");
         throw new ExpressError(errors, 400);
     } else {
-        console.log("No Errors");
         next();
     }
 };
@@ -41,7 +40,6 @@ router.delete(
     "/:reviewId",
     asyncErrorHandler(async (request, response) => {
         const { campgroundId, reviewId } = request.params;
-        console.log(campgroundId, reviewId);
         // pull tells mongo to remove form collection
         await Campground.findByIdAndUpdate(campgroundId, { $pull: { review: reviewId } });
         await Review.findByIdAndDelete(reviewId);
