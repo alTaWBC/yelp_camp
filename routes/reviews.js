@@ -1,25 +1,13 @@
 const express = require("express");
 const Review = require("../models/review");
-const joiReview = require("../joi/review");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
-const ExpressError = require("../utils/expressError");
 const Campground = require("../models/campground");
-const { isLoggedIn } = require("../middleware/middleware");
+const { isLoggedIn, validateReview } = require("../middleware/middleware");
 
 // Use this line to have access all parameters
 // { mergeParams: true }
 // when using routers
 const router = express.Router({ mergeParams: true });
-
-const validateReview = (request, _, next) => {
-    const { error } = joiReview.ReviewSchema.validate(request.body);
-    if (error) {
-        const errors = error.details.map(({ message }) => message).join(", ");
-        throw new ExpressError(errors, 400);
-    } else {
-        next();
-    }
-};
 
 router.post(
     "/",

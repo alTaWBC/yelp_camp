@@ -1,21 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
-const joiCampground = require("../joi/campground");
-const ExpressError = require("../utils/expressError");
 const Campground = require("../models/campground");
-const { request } = require("express");
-const { isLoggedIn } = require("../middleware/middleware");
+const { isLoggedIn, validateCampground, isAuthor } = require("../middleware/middleware");
 
-const validateCampground = (request, _, next) => {
-    const { error } = joiCampground.CampgroundSchema.validate(request.body);
-    if (error) {
-        const errors = error.details.map(({ message }) => message).join(", ");
-        throw new ExpressError(errors, 400);
-    } else {
-        next();
-    }
-};
+
 
 router.get(
     "/",
@@ -49,6 +38,7 @@ router.get(
 router.get(
     "/:id/edit",
     isLoggedIn,
+    isAuthor,
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
         const campground = await Campground.findById(id);
@@ -72,6 +62,7 @@ router.post(
 router.delete(
     "/:id",
     isLoggedIn,
+    isAuthor,
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
         await Campground.findByIdAndDelete(id);
@@ -82,22 +73,18 @@ router.delete(
 router.patch(
     "/:id",
     isLoggedIn,
+    isAuthor,
     validateCampground,
     asyncErrorHandler(async (request, response) => {
         const { title, location, image, description, price } = request.body.campground;
         const { id } = request.params;
-        const campground = await Campground.findById(id);
-        if (!campground.author.equals(request.user._id)) {
-            request.flash("error", "You do not have permission to do that!");
-            return response.redirect(`/campgrounds/${id}`);
-        }
-        const newCampground = await Campground.findByIdAndUpdate(
+        const campground = await Campground.findByIdAndUpdate(
             id,
             { title, location, image, description, price },
             { runValidators: true }
         );
         request.flash("success", "You successfully updated a campground");
-        response.redirect(`/campgrounds/${newCampground._id}`);
+        response.redirect(`/campgrounds/${campground._id}`);
     })
 );
 
