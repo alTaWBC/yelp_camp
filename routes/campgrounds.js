@@ -4,6 +4,8 @@ const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const joiCampground = require("../joi/campground");
 const ExpressError = require("../utils/expressError");
 const Campground = require("../models/campground");
+const { request } = require("express");
+const { isLoggedIn } = require("../middleware/middleware");
 
 const validateCampground = (request, _, next) => {
     const { error } = joiCampground.CampgroundSchema.validate(request.body);
@@ -25,7 +27,8 @@ router.get(
 
 router.get(
     "/new",
-    asyncErrorHandler(async (_, response) => {
+    isLoggedIn,
+    asyncErrorHandler(async (request, response) => {
         response.render("campgrounds/new");
     })
 );
@@ -45,6 +48,7 @@ router.get(
 
 router.get(
     "/:id/edit",
+    isLoggedIn,
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
         const campground = await Campground.findById(id);
@@ -66,6 +70,7 @@ router.post(
 
 router.delete(
     "/:id",
+    isLoggedIn,
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
         await Campground.findByIdAndDelete(id);
@@ -75,6 +80,7 @@ router.delete(
 
 router.patch(
     "/:id",
+    isLoggedIn,
     validateCampground,
     asyncErrorHandler(async (request, response) => {
         const { title, location, image, description, price } = request.body.campground;

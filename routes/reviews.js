@@ -4,6 +4,7 @@ const joiReview = require("../joi/review");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const ExpressError = require("../utils/expressError");
 const Campground = require("../models/campground");
+const { isLoggedIn } = require("../middleware/middleware");
 
 // Use this line to have access all parameters
 // { mergeParams: true }
@@ -22,6 +23,7 @@ const validateReview = (request, _, next) => {
 
 router.post(
     "/",
+    isLoggedIn,
     validateReview,
     asyncErrorHandler(async (request, response) => {
         const { campgroundId } = request.params;
@@ -38,6 +40,7 @@ router.post(
 
 router.delete(
     "/:reviewId",
+    isLoggedIn,
     asyncErrorHandler(async (request, response) => {
         const { campgroundId, reviewId } = request.params;
         // pull tells mongo to remove form collection

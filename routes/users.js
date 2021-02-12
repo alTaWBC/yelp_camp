@@ -29,8 +29,18 @@ router.get("/login", (request, response) => {
 });
 
 // Using passport for authentication
-router.post("/login", passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }), (request, response) => {
-    request.flash("success", "welcome back");
+router.post(
+    "/login",
+    passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }),
+    (request, response) => {
+        request.flash("success", "welcome back");
+        response.redirect("/campgrounds");
+    }
+);
+
+router.get("/logout", (request, response) => {
+    request.logout();
+    request.flash("success", "Goodbye!");
     response.redirect("/campgrounds");
 });
 
