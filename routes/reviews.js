@@ -18,6 +18,7 @@ router.post(
         const { body, rating } = request.body.review;
         const campground = await Campground.findById(campgroundId).populate("reviews");
         const review = Review({ body, rating });
+        review.author = request.user._id;
         campground.reviews.push(review);
         await review.save();
         await campground.save();
