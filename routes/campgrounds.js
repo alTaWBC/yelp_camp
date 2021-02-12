@@ -37,7 +37,7 @@ router.get(
     "/:id",
     asyncErrorHandler(async (request, response) => {
         const { id } = request.params;
-        const campground = await Campground.findById(id).populate("reviews");
+        const campground = await Campground.findById(id).populate("reviews").populate("author");
         if (!campground) {
             request.flash("error", "Cannot find that campground");
             return response.redirect("/campgrounds");
@@ -62,6 +62,7 @@ router.post(
     asyncErrorHandler(async (request, response) => {
         const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
         const campground = new Campground({ title, location, image, description, price });
+        campground.author = request.user._id;
         await campground.save();
         request.flash("success", "You successfully added a campground");
         response.redirect(`/campgrounds/${campground._id}`);
