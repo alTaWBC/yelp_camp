@@ -13,10 +13,12 @@
                 <li class="list-group-item">€<%= campground.price %>/night</li>
             </ul>
             <div class="card-body">
+                <% if(currentUser && campground.author.equals(currentUser)) { %>
                 <a href="/campgrounds/<%= campground._id %>/edit" class="btn btn-primary">Edit</a>
                 <form class="d-inline" action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
                     <button class="btn btn-danger">Delete</button>
                 </form>
+                <% } %>
                 <a href="/campgrounds" class="btn btn-success">Return</a>
             </div>
             <div class="card-footer text-muted">2 days ago</div>
