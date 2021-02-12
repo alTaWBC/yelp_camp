@@ -1,92 +1,26 @@
 const express = require("express");
 const router = express.Router();
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
-const Campground = require("../models/campground");
 const { isLoggedIn, validateCampground, isAuthor } = require("../middleware/middleware");
+const campgrounds = require("../controllers/campgrounds");
 
-router.get(
-    "/",
-    asyncErrorHandler(async (_, response) => {
-        const campgrounds = await Campground.find({});
-        response.render("campgrounds/index", { campgrounds });
-    })
-);
+// GET
+router.get("/", asyncErrorHandler(campgrounds.index));
 
-router.get(
-    "/new",
-    isLoggedIn,
-    asyncErrorHandler(async (request, response) => {
-        response.render("campgrounds/new");
-    })
-);
+router.get("/:id", asyncErrorHandler(campgrounds.view));
 
-router.get(
-    "/:id",
-    asyncErrorHandler(async (request, response) => {
-        const { id } = request.params;
-        // How to do nested populate
-        const campground = await Campground.findById(id)
-            .populate({ path: "reviews", populate: { path: "author" } })
-            .populate("author");
-        if (!campground) {
-            request.flash("error", "Cannot find that campground");
-            return response.redirect("/campgrounds");
-        }
-        response.render("campgrounds/show", { campground });
-    })
-);
+router.get("/new", isLoggedIn, asyncErrorHandler(campgrounds.createForm));
 
-router.get(
-    "/:id/edit",
-    isLoggedIn,
-    isAuthor,
-    asyncErrorHandler(async (request, response) => {
-        const { id } = request.params;
-        const campground = await Campground.findById(id);
-        response.render("campgrounds/edit", { campground });
-    })
-);
+router.get("/:id/edit", isLoggedIn, isAuthor, asyncErrorHandler(campgrounds.editForm));
 
-router.post(
-    "/",
-    validateCampground,
-    asyncErrorHandler(async (request, response) => {
-        const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
-        const campground = new Campground({ title, location, image, description, price });
-        campground.author = request.user._id;
-        await campground.save();
-        request.flash("success", "You successfully added a campground");
-        response.redirect(`/campgrounds/${campground._id}`);
-    })
-);
+// POST
 
-router.delete(
-    "/:id",
-    isLoggedIn,
-    isAuthor,
-    asyncErrorHandler(async (request, response) => {
-        const { id } = request.params;
-        await Campground.findByIdAndDelete(id);
-        response.redirect("/campgrounds");
-    })
-);
+router.post("/", validateCampground, asyncErrorHandler(campgrounds.create));
 
-router.patch(
-    "/:id",
-    isLoggedIn,
-    isAuthor,
-    validateCampground,
-    asyncErrorHandler(async (request, response) => {
-        const { title, location, image, description, price } = request.body.campground;
-        const { id } = request.params;
-        const campground = await Campground.findByIdAndUpdate(
-            id,
-            { title, location, image, description, price },
-            { runValidators: true }
-        );
-        request.flash("success", "You successfully updated a campground");
-        response.redirect(`/campgrounds/${campground._id}`);
-    })
-);
+// DELETE
+router.delete("/:id", isLoggedIn, isAuthor, asyncErrorHandler(campgrounds.delete));
+
+// PATCH
+router.patch("/:id", isLoggedIn, isAuthor, validateCampground, asyncErrorHandler(campgrounds.edit));
 
 module.exports = router;
