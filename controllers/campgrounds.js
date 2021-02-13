@@ -1,5 +1,8 @@
 const { cloudinary } = require("../cloudinary");
 const Campground = require("../models/campground");
+const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
 
 module.exports.index = async (_, response) => {
     const campgrounds = await Campground.find({});
@@ -31,13 +34,24 @@ module.exports.editForm = async (request, response) => {
 
 module.exports.create = async (request, response) => {
     const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
-    const campground = new Campground({ title, location, image, description, price });
-    campground.author = request.user._id;
-    campground.images = request.files.map((f) => ({ url: f.path, filename: f.filename }));
-    await campground.save();
-    console.log(campground);
-    request.flash("success", "You successfully added a campground");
-    response.redirect(`/campgrounds/${campground._id}`);
+    const geoData = await geocoder
+        .forwardGeocode({
+            query: location,
+            limit: 1,
+        })
+        .send();
+    let x,
+        y = geoData.body.features[0];
+    x, (y = [y, x]);
+    console.log(`${x}, ${y}`);
+    response.send(`${x}, ${y}`);
+    // const campground = new Campground({ title, location, image, description, price });
+    // campground.author = request.user._id;
+    // campground.images = request.files.map((f) => ({ url: f.path, filename: f.filename }));
+    // await campground.save();
+    // console.log(campground);
+    // request.flash("success", "You successfully added a campground");
+    // response.redirect(`/campgrounds/${campground._id}`);
 };
 
 module.exports.delete = async (request, response) => {
