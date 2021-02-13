@@ -4,7 +4,6 @@ const User = require("../models/user");
 const RedirectRequest = (path) => {
     if (!path) return "/campgrounds";
     const id = path.split("/")[2];
-    console.log(id);
     return `/campgrounds/${id}`;
 };
 

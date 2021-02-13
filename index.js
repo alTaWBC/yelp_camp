@@ -3,8 +3,6 @@ if (process.env.NODE_ENV !== "production") {
     // Access variable with process.env.[variablename]
 }
 
-console.log(process.env.CLOUDINARY_API_KEY);
-
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");

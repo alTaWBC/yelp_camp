@@ -6,7 +6,6 @@ module.exports.index = async (_, response) => {
 };
 
 module.exports.createForm = async (_, response) => {
-    console.log("Here");
     response.render("campgrounds/new");
 };
 
@@ -33,7 +32,9 @@ module.exports.create = async (request, response) => {
     const { title, location, image, description, price } = request.body.campground; // Use like this if in ejs we did campground[field]
     const campground = new Campground({ title, location, image, description, price });
     campground.author = request.user._id;
+    campground.images = request.files.map((f) => ({ url: f.path, filename: f.filename }));
     await campground.save();
+    console.log(campground);
     request.flash("success", "You successfully added a campground");
     response.redirect(`/campgrounds/${campground._id}`);
 };

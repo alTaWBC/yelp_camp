@@ -11,10 +11,18 @@ const CampgroundSchema = new Schema({
         type: Number,
         required: true,
     },
-    image: {
-        type: String,
-        required: true,
-    },
+    images: [
+        {
+            url: {
+                type: String,
+                required: true,
+            },
+            filename: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
     description: {
         type: String,
         required: true,
