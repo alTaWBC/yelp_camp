@@ -4,7 +4,9 @@ const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const { isLoggedIn, validateCampground, isAuthor } = require("../middleware/middleware");
 const campgrounds = require("../controllers/campgrounds");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+// Node goes for index file automatically \|/
+const { storage } = require("../cloudinary");
+const upload = multer({ storage });
 
 // GET
 router
