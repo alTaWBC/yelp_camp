@@ -48,6 +48,7 @@ module.exports.delete = async (request, response) => {
 module.exports.edit = async (request, response) => {
     const { title, location, image, description, price } = request.body.campground;
     const { id } = request.params;
+    const { deleteImages } = request.body;
     const campground = await Campground.findByIdAndUpdate(
         id,
         { title, location, image, description, price },
