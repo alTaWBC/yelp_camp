@@ -1,11 +1,13 @@
 mapboxgl.accessToken = mapToken;
-console.log(center);
-center = center || [-74.5, 40];
+center = campground.geometry.coordinates || [-74.5, 40];
 const map = new mapboxgl.Map({
     container: "map",
-    style: "mapbox://styles/mapbox/streets-v11",
+    style: "mapbox://styles/mapbox/light-v10",
     center: center,
     zoom: 4,
 });
 
-var marker = new mapboxgl.Marker().setLngLat(center).addTo(map);
+var marker = new mapboxgl.Marker()
+    .setLngLat(center)
+    .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`<h3>${campground.title}</h3><p>${campground.location}</p>`))
+    .addTo(map);
