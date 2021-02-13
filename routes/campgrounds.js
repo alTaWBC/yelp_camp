@@ -20,7 +20,7 @@ router
     .route("/:id")
     .get(asyncErrorHandler(campgrounds.view))
     .delete(isLoggedIn, isAuthor, asyncErrorHandler(campgrounds.delete))
-    .patch(isLoggedIn, isAuthor, validateCampground, asyncErrorHandler(campgrounds.edit));
+    .patch(isLoggedIn, isAuthor, upload.array("image"), validateCampground, asyncErrorHandler(campgrounds.edit));
 
 router.get("/:id/edit", isLoggedIn, isAuthor, asyncErrorHandler(campgrounds.editForm));
 

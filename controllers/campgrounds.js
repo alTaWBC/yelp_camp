@@ -53,6 +53,9 @@ module.exports.edit = async (request, response) => {
         { title, location, image, description, price },
         { runValidators: true }
     );
+    const images = request.files.map((f) => ({ url: f.path, filename: f.filename }));
+    campground.images.push(...images);
+    await campground.save();
     request.flash("success", "You successfully updated a campground");
     response.redirect(`/campgrounds/${campground._id}`);
 };
