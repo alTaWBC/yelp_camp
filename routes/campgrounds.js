@@ -7,14 +7,13 @@ const campgrounds = require("../controllers/campgrounds");
 // GET
 router.get("/", asyncErrorHandler(campgrounds.index));
 
-router.get("/:id", asyncErrorHandler(campgrounds.view));
-
 router.get("/new", isLoggedIn, asyncErrorHandler(campgrounds.createForm));
+
+router.get("/:id", asyncErrorHandler(campgrounds.view));
 
 router.get("/:id/edit", isLoggedIn, isAuthor, asyncErrorHandler(campgrounds.editForm));
 
 // POST
-
 router.post("/", validateCampground, asyncErrorHandler(campgrounds.create));
 
 // DELETE

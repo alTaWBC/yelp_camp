@@ -6,6 +6,7 @@ module.exports.index = async (_, response) => {
 };
 
 module.exports.createForm = async (_, response) => {
+    console.log("Here");
     response.render("campgrounds/new");
 };
 
