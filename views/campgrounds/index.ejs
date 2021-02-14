@@ -30,5 +30,7 @@
 </ul>
 <script>
     const accessToken = "<%- process.env.MAPBOX_TOKEN %>";
+    // Data needs to be under features
+    const campgrounds = { features: <%- JSON.stringify(campgrounds) %>};
 </script>
 <script src="/javascript/clusterMap.js"></script>
