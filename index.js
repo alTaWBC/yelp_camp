@@ -45,6 +45,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(mongoSanitize());
 
 const sessionConfig = {
+    // Change cookie name
+    name: "yelp-camp",
     secret: "thishsouldbeabettersecret!",
     resave: false,
     saveUninitialized: true,
@@ -52,6 +54,8 @@ const sessionConfig = {
         // These are the same
         // They late for a week
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        // ! Only works over https
+        // secure: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
         httpOnly: true, // Only lets http requests access to cookies
         // Does not allow third party scripts
