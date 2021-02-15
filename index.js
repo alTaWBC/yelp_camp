@@ -168,6 +168,8 @@ app.use((error, _, response, __) => {
     response.status(statusCode).render("errors/mongoose", { error });
 });
 
-app.listen(3000, () => {
-    console.log("Server on port 3000");
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+    console.log(`Serving on port ${port}`);
 });
