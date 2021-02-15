@@ -31,6 +31,9 @@
 <script>
     const accessToken = "<%- process.env.MAPBOX_TOKEN %>";
     // Data needs to be under features
+    /* eslint-disable */
+    // prettier-ignore
     const campgrounds = { features: <%- JSON.stringify(campgrounds) %>};
+    // eslint-enable
 </script>
 <script src="/javascript/clusterMap.js"></script>
